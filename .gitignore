@@ -1,0 +1,7 @@
+/PlayerSkeleton.class
+/State.class
+/TFrame.class
+/TLabel.class
+*.class
+.project
+.classpath
