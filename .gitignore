@@ -5,3 +5,5 @@
 *.class
 .project
 .classpath
+.idea/
+CS3243TeamProject.iml
