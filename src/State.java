@@ -1,5 +1,6 @@
 package src;
 import java.awt.Color;
+import java.util.Arrays;
 
 
 
@@ -111,7 +112,7 @@ public class State {
 	
 	}
 	
-	
+	/////LOLOLOLOLOLOLLOLOLOLOLLOOLOOLOLLOLOLOLOOLOOLOLOLOLOLOLOLOLO THAT CAN'T BE SERIOUS!! 
 	public int[][] getField() {
 		return field;
 	}
@@ -179,8 +180,8 @@ public class State {
 	}
 	
 	//make a move based on the move index - its order in the legalMoves list
-	public void makeMove(int move) {
-		makeMove(legalMoves[nextPiece][move]);
+	public boolean makeMove(int move) {
+		return makeMove(legalMoves[nextPiece][move]);
 	}
 	
 	//make a move based on an array of orient and slot
@@ -257,7 +258,52 @@ public class State {
 		
 		return true;
 	}
+	/* ========================================
+	 * 				MODIFIED PART
+	 * ========================================
+	 */
+	public State(
+			boolean lost,
+			int turn,
+			int cleared,
+			int[][] field,
+			int[]top,
+			int nextPiece){
+		this.lost = lost;
+		this.turn = turn;
+		this.cleared = cleared;
+		for(int i=0;i<field.length;i++){
+			this.field[i] = Arrays.copyOf(field[i],field[i].length );
+		}
+		this.top = Arrays.copyOf(top, top.length);
+		this.nextPiece = nextPiece;
+		
+	}
+	//make a move based on the move index - its order in the legalMoves list
+	public State nextState(int move) {
+		return nextState(legalMoves[nextPiece][move]);
+	}
 	
+	//make a move based on an array of orient and slot
+	public State nextState(int[] move) {
+		return nextState(move[ORIENT],move[SLOT]);
+	}
+	
+	public State nextState(int orient, int slot) {
+		State next = this.copy();
+		next.makeMove(orient,slot);
+		return next;
+	}
+	
+	private State copy() {
+		return new State(lost,turn,cleared,field,top,nextPiece);
+	}
+
+	
+	/*========================================
+	 * 		   END OF MODIFICATIONS
+	 *========================================
+	 */
 	public void draw() {
 		label.clear();
 		label.setPenRadius();
@@ -288,7 +334,7 @@ public class State {
 		
 	}
 	
-	public static final Color brickCol = Color.gray; 
+	public static final Color brickCol = Color.yellow; //was gray, but it's better in yellow
 	
 	private void drawBrick(int c, int r) {
 		label.filledRectangleLL(c, r, 1, 1, brickCol);
