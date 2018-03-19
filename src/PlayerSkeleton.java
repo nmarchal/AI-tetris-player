@@ -2,18 +2,13 @@ package src;
 
 public class PlayerSkeleton {
 
-	//implement this function to have a working system
-	public int pickMove(State s, int[][] legalMoves) {
-		
-		return 0;
-	}
 	
 	public static void main(String[] args) {
 		State s = new State();
 		new TFrame(s);
-		PlayerSkeleton p = new PlayerSkeleton();
+		TetrisSolver aI = new StartingSolver();
 		while(!s.hasLost()) {
-			s.makeMove(p.pickMove(s,s.legalMoves()));
+			s.makeMove(aI.pickMove(s,s.legalMoves()));
 			s.draw();
 			s.drawNext(0,0);
 			try {
