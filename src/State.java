@@ -217,7 +217,8 @@ public class State {
 	}
 
 	/*
-	 * ======================================== MODIFIED PART
+	 * ======================================== 
+	 * 			MODIFIED PART
 	 * ========================================
 	 */
 	public State(boolean lost, int turn, int cleared, int[][] field, int[] top, int nextPiece) {
@@ -253,7 +254,8 @@ public class State {
 	}
 
 	/*
-	 * ======================================== END OF MODIFICATIONS
+	 * ======================================== 
+	 * 			END OF MODIFICATIONS
 	 * ========================================
 	 */
 	public void draw() {
