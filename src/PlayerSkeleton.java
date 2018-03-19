@@ -2,12 +2,13 @@ package src;
 
 public class PlayerSkeleton {
 	public static final StartingSolver DUMBSOLVER = new StartingSolver();
+	public static final RandomSolver RANDOMSOLVER = new RandomSolver();
 
 	
 	public static void main(String[] args) {
 		State s = new State();
 		new TFrame(s);
-		TetrisSolver aI = DUMBSOLVER;
+		TetrisSolver aI = RANDOMSOLVER;
 		while(!s.hasLost()) {
 			s.makeMove(aI.pickMove(s,s.legalMoves()));
 			s.draw();
