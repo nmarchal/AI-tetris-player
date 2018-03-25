@@ -13,6 +13,12 @@ public class PlayerSkeleton {
 			-1,								//
 			-50
 	};
+	private static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
+			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
+	private static final float[] BEST_WEIGHTS = {
+			-4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
+			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f 
+	};
 	
 	
 	/*
@@ -80,7 +86,7 @@ public class PlayerSkeleton {
 	 * Solver that return a random move
 	 *
 	 */
-	public static class RandomSolver implements TetrisSolver {
+	public static final class RandomSolver implements TetrisSolver {
 
 		@Override
 		public int pickMove(State s, int[][] legalMoves, float[] w) {
@@ -100,7 +106,7 @@ public class PlayerSkeleton {
 	 * Solver using the heuristic function at depth 1
 	 *
 	 */
-	public static class StartingSolver implements TetrisSolver{
+	public static final class StartingSolver implements TetrisSolver{
 		
 		public static final int LENGTH = State.COLS + State.COLS-1 + 3;
 		
@@ -193,7 +199,7 @@ public class PlayerSkeleton {
 		TetrisSolver aI = BASIC_SOLVER;
 		long start = System.currentTimeMillis();
 		while(!s.hasLost()) {
-			s.makeMove(aI.pickMove(s,s.legalMoves(),BASICS_WEIGHTS));
+			s.makeMove(aI.pickMove(s,s.legalMoves(),COMPUTED_WEIGHTS));
 			s.draw();
 			s.drawNext(0,0);
 			try {
