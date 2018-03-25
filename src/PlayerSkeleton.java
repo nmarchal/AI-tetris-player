@@ -250,17 +250,20 @@ public class PlayerSkeleton {
 			float max = Float.NEGATIVE_INFINITY; 
 			int bestMove=0;
 			int n =0;
-			for(int[] move: legalMoves){
-				State next = TetrisSolver.nextState(s,move);
-				float heuristicValue = minmax(next, depth, false, weights);
-				
-				if(heuristicValue>max){
-					max = heuristicValue;
-					bestMove = n;
+			int d=depth;
+			while(max == Float.NEGATIVE_INFINITY) {
+				for(int[] move: legalMoves){
+					State next = TetrisSolver.nextState(s,move);
+					float heuristicValue = minmax(next, d, false, weights);
+					
+					if(heuristicValue>max){
+						max = heuristicValue;
+						bestMove = n;
+					}
+					n++;
 				}
-				n++;
+				d -= 2;
 			}
-			
 			return bestMove;
 		}
 
