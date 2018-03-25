@@ -16,8 +16,8 @@ public class PlayerSkeleton {
 	private static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
 	private static final float[] BEST_WEIGHTS = {
-			-4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
-			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f 
+			4.0f, 0.0f, -2.0f, -1.0f, -2.0f, -1.0f, 1.0f, -4.0f, 0.0f, -2.0f, 1.0f, -2.0f, -1.0f, -1.0f, -2.0f, -2.0f,
+			-3.0f, -3.0f, -1.0f, -3.0f, -1.0f, -10.0f 
 	};
 	
 	

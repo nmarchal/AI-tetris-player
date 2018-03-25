@@ -13,6 +13,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 
 	@Override
 	public float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed) {
+
 		try (Writer writer = new BufferedWriter(new FileWriter("data.csv",false))) {
 		
 		float[] weights = new float[solver.weightsLength()];
@@ -32,17 +33,20 @@ public final class ArrangedSALearner implements TetrisLearner {
 				}
 			}
 			int nextVal =  TetrisLearner.solveAvg(solver, next , maxLine,averageGamePlayed);
-			writer.write(nextVal + ",");
+			writer.write(nextVal + ";");
 			if(nextVal > value){
 				value = nextVal;
 				weights = next.clone();
 			}else{
-				if (value > 200) {
+				if (value > 100) {
 					double r = random.nextDouble();
-					if(r < Math.exp(-Math.sqrt((value - nextVal)/value) * Math.pow(n, 1.3))/(duration - n)){
+					double proba =Math.exp(-(double)(value - nextVal+1)/value * Math.pow(n, 1.3)/(duration - n));
+					if (proba > 0.5) {
+						proba = 0.5 ;
+						}
+					if(r < proba){
 						value = nextVal;
 						weights = next.clone();
-						System.out.println("r = " + r);
 					}
 				}
 			}
@@ -55,6 +59,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 		writer.close();
 		return weights;
 		}catch(Exception e) {
+			e.printStackTrace();
 			throw new Error();
 		}
 		

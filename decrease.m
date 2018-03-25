@@ -2,11 +2,11 @@ clc
 clear all 
 close all
 
-N = 500 ;
+N = 300 ;
 X = 0:1:N ;
 
-f= @(n) exp(-sqrt(0.1).*n.^(1.3)./(N-n)) ;
-f(478)
+f= @(n) exp(-sqrt(0.5).*n.^(1.3)./(N-n)) ;
+f(150)
 
 figure (1)
 plot (X,f(X))
