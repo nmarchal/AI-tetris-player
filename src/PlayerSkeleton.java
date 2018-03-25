@@ -5,7 +5,7 @@ public class PlayerSkeleton {
 	/*
 	 * Constants used as parameters for the AI
 	 */
-	private static final float[] DUMBS_WEIGHTS = new float[StartingSolver.LENGTH];
+	private static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
 	private static final float[] BASICS_WEIGHTS = {
 			0,								//weight 0
 			-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	//columns weights
@@ -26,8 +26,87 @@ public class PlayerSkeleton {
 	 * 
 	 */
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
-	public static final StartingSolver BASIC_SOLVER = new StartingSolver();
+	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
+	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
+	
+	/**
+	 * Interface of heuristic
+	 *
+	 */
+	public static interface Heuristic {
+		
+		/**
+		 * @param next
+		 * 		The state to with the heuristic to compute
+		 * @param w
+		 * 		the weights parameters of the heuristic
+		 * @return
+		 * 		the heuristic result
+		 */
+		public float compute(State next,float[] w);
+		
+		 /**
+	     * @return the number of weight used by the solver
+	     */
+	    public int weightsLength();
+	}
 
+	/**
+	 * class representing the heuristic given ins the projects instruction
+	 *
+	 */
+	public static class GivenHeuristic implements Heuristic{
+
+		public static final int LENGTH = State.COLS + State.COLS-1 + 3;
+		
+		private static final int INDICE_COLS_WEIGHTS = 1;
+		private static final int INDICE_COLS_DIFF_WEIGTHS = INDICE_COLS_WEIGHTS + State.COLS;
+		private static final int INDICE_MAX_HEIGHT_WEIGHT = INDICE_COLS_DIFF_WEIGTHS +State.COLS -1;
+		private static final int INDICE_HOLES_WEIGHT = INDICE_MAX_HEIGHT_WEIGHT +1;
+		
+		@Override
+		public float compute(State state, float[] weights) {
+			float heuristicValue = weights[0];
+			int maxHeight =0;
+			int holes =0;
+			for(int i=0; i<State.COLS; i++){
+				
+				//height
+				int height = state.getTop()[i];
+				heuristicValue += weights[INDICE_COLS_WEIGHTS+i]*height;
+				if(height>maxHeight){
+					maxHeight = height;
+				}
+				
+				//holes
+				for(int j=0; j<height-1;j++){
+					if(state.getField()[j][i]==0){
+						holes++;
+					}
+				}
+			}
+			heuristicValue += holes*weights[INDICE_HOLES_WEIGHT];
+			heuristicValue += maxHeight*weights[INDICE_MAX_HEIGHT_WEIGHT];
+			
+			//differences
+			for(int i=0; i<State.COLS-1; i++){
+				int diff =Math.abs(state.getTop()[i]-state.getTop()[i+1]);
+				
+				heuristicValue += weights[INDICE_COLS_DIFF_WEIGTHS+i]*diff;
+			}
+			
+			if(state.lost){
+				heuristicValue = Float.NEGATIVE_INFINITY;
+			}
+			return heuristicValue;
+		}
+
+		@Override
+		public int weightsLength() {
+			return LENGTH;
+		}
+		
+	}
 	
 	/**
 	 * Interface that represent an AI for Tetris
@@ -108,65 +187,29 @@ public class PlayerSkeleton {
 	 */
 	public static final class StartingSolver implements TetrisSolver{
 		
-		public static final int LENGTH = State.COLS + State.COLS-1 + 3;
-		
-		private static final int INDICE_COLS_WEIGHTS = 1;
-		private static final int INDICE_COLS_DIFF_WEIGTHS = INDICE_COLS_WEIGHTS + State.COLS;
-		private static final int INDICE_MAX_HEIGHT_WEIGHT = INDICE_COLS_DIFF_WEIGTHS +State.COLS -1;
-		private static final int INDICE_HOLES_WEIGHT = INDICE_MAX_HEIGHT_WEIGHT +1;
-		
-		
+		private final Heuristic heuristic;
 		/**
 		 * Default constructor, initialize all weights to 0
 		 */
-		public StartingSolver() {}
+		public StartingSolver(Heuristic heuristic) {
+			this.heuristic = heuristic;
+		}
 		
 
 		@Override
 		public int pickMove(State s, int[][] legalMoves, float[] w) {
-			if( w.length != LENGTH){
-				throw new IllegalArgumentException("wrong number of weights: "+ w.length+". Expected: "+LENGTH); 
+			if( w.length != weightsLength()){
+				throw new IllegalArgumentException("wrong number of weights: "+ w.length+". Expected: "+weightsLength()); 
 			}
 			float max = Float.NEGATIVE_INFINITY; 
 			int bestMove=0;
 			int n =0;
 			for(int[] move: legalMoves){
 				State next = TetrisSolver.nextState(s,move);
-				float heuristic = w[0];
-				int maxHeight =0;
-				int holes =0;
-				for(int i=0; i<State.COLS; i++){
-					
-					//height
-					int height = next.getTop()[i];
-					heuristic += w[INDICE_COLS_WEIGHTS+i]*height;
-					if(height>maxHeight){
-						maxHeight = height;
-					}
-					
-					//holes
-					for(int j=0; j<height-1;j++){
-						if(next.getField()[j][i]==0){
-							holes++;
-						}
-					}
-				}
-				heuristic += holes*w[INDICE_HOLES_WEIGHT];
-				heuristic += maxHeight*w[INDICE_MAX_HEIGHT_WEIGHT];
+				float heuristicValue = heuristic.compute(next, w);
 				
-				//differences
-				for(int i=0; i<State.COLS-1; i++){
-					int diff =Math.abs(next.getTop()[i]-next.getTop()[i+1]);
-					
-					heuristic += w[INDICE_COLS_DIFF_WEIGTHS+i]*diff;
-				}
-				
-				if(next.lost){
-					heuristic = Float.NEGATIVE_INFINITY;
-				}
-				
-				if(heuristic>max){
-					max = heuristic;
+				if(heuristicValue>max){
+					max = heuristicValue;
 					bestMove = n;
 				}
 				n++;
@@ -177,7 +220,7 @@ public class PlayerSkeleton {
 
 		@Override
 		public int weightsLength() {
-			return LENGTH;
+			return heuristic.weightsLength();
 		}
 
 	}
@@ -185,7 +228,89 @@ public class PlayerSkeleton {
 	
 	
 	
-	
+	/**
+	 * Solver using MinMax Algorithm
+	 *
+	 */
+	public static final class MinMaxSolver implements TetrisSolver{
+		
+		private final Heuristic heuristic;
+		private final int depth;
+		
+		public MinMaxSolver(Heuristic heur,int depth) {
+			heuristic = heur;
+			this.depth = depth;
+		}
+		
+		@Override
+		public int pickMove(State s, int[][] legalMoves, float[] weights) {
+			if( weights.length != weightsLength()){
+				throw new IllegalArgumentException("wrong number of weights: "+ weights.length+". Expected: "+weightsLength()); 
+			}
+			float max = Float.NEGATIVE_INFINITY; 
+			int bestMove=0;
+			int n =0;
+			for(int[] move: legalMoves){
+				State next = TetrisSolver.nextState(s,move);
+				float heuristicValue = minmax(next, depth, false, weights);
+				
+				if(heuristicValue>max){
+					max = heuristicValue;
+					bestMove = n;
+				}
+				n++;
+			}
+			
+			return bestMove;
+		}
+
+		@Override
+		public int weightsLength() {
+			return heuristic.weightsLength();
+		}
+		
+		/**
+		 * @param s
+		 * 		state of the node
+		 * @param d
+		 * 		depth
+		 * @param maximizing
+		 * 		boolean true if we try to maximize
+		 * @param weights
+		 * 		weights 
+		 * @return the MINMAX best heuristic value
+		 */
+		private float minmax(State s,int d,boolean maximizing,float[] weights){
+			if(s.hasLost()){
+				return Float.NEGATIVE_INFINITY;
+			}
+			if(d <=0 ){
+				return heuristic.compute(s,weights );
+			}
+			
+			if(maximizing){
+				float best = Float.NEGATIVE_INFINITY;
+				for(int[] move :s.legalMoves()){
+					State next = TetrisSolver.nextState(s, move);
+					float v = minmax(next, d-1, false, weights);
+					if(v>best){
+						best = v;
+					}
+				}
+				return best;
+			}else{
+				float best = Float.POSITIVE_INFINITY;
+				for(int i = 0; i<State.N_PIECES; i++){
+					s.nextPiece =i;
+					float v = minmax(s, d-1, true, weights);
+					if(v<best){
+						best = v;
+					}
+				}
+				return best;
+			}
+		}
+	}
 	
 	
 	
@@ -196,17 +321,17 @@ public class PlayerSkeleton {
 	public static void main(String[] args) {
 		State s = new State();
 		new TFrame(s);
-		TetrisSolver aI = BASIC_SOLVER;
+		TetrisSolver aI = MINMAX_SOLVER;
 		long start = System.currentTimeMillis();
 		while(!s.hasLost()) {
-			s.makeMove(aI.pickMove(s,s.legalMoves(),COMPUTED_WEIGHTS));
+			s.makeMove(aI.pickMove(s,s.legalMoves(),BEST_WEIGHTS));
 			s.draw();
 			s.drawNext(0,0);
-			try {
+			/*try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
 		long end = System.currentTimeMillis();
 		long diff = end-start;
