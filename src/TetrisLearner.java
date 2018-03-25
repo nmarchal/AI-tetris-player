@@ -18,9 +18,11 @@ public interface TetrisLearner {
      * 		represent the limit/time/iterations that have the learner before finishing
      * @param maxLine
      * 		represent the maximum number of line to remove in the tetris before considering it infinity
+     * @param averageGamePlayed
+     * 		The number of games taken to do an average
      * @return
      */
-    public float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine);
+    public float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed);
 
 
     public static int solveAvg(PlayerSkeleton.TetrisSolver solver,float[] weights, int maxLine, int n ){
