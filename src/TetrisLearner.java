@@ -20,14 +20,19 @@ public interface TetrisLearner {
      * 		represent the maximum number of line to remove in the tetris before considering it infinity
      * @param averageGamePlayed
      * 		The number of games taken to do an average
+     * @param lastValue
+     * 		the previous value of lines
      * @return
      */
     public float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed);
 
 
-    public static int solveAvg(PlayerSkeleton.TetrisSolver solver,float[] weights, int maxLine, int n ){
+    public static int solveAvg(PlayerSkeleton.TetrisSolver solver,float[] weights, int maxLine, int n, int lastValue){
     	int sum = 0;
     	for(int i=0; i<n ; i++){
+    		if(i==4 &&lastValue>50 && sum*4<i*lastValue*3){
+    			return sum /i;
+    		}
     		State s = new State();
     		while(!s.hasLost() && s.getRowsCleared()<maxLine){
     			s.makeMove(solver.pickMove(s,s.legalMoves(), weights));
@@ -35,6 +40,23 @@ public interface TetrisLearner {
     		sum += s.getRowsCleared();
     	}
     	return sum/n;
+    }
+    
+    public static int solveMin(PlayerSkeleton.TetrisSolver solver,float[] weights, int maxLine, int n, int lastValue){
+    	int min = maxLine;
+    	for(int i=0; i<n ; i++){
+    		State s = new State();
+    		while(!s.hasLost() && s.getRowsCleared()<maxLine){
+    			s.makeMove(solver.pickMove(s,s.legalMoves(), weights));
+    		}
+    		if(s.getRowsCleared()<min){
+    			min = s.getRowsCleared();
+    			if(min<lastValue){
+    				return min;
+    			}
+    		}
+    	}
+    	return min;
     }
 
 }
