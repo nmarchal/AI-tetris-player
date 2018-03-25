@@ -1,23 +1,26 @@
 package src;
 
-import java.util.Arrays;
-
 public class PlayerSkeleton {
 
 	/*
 	 * Constants used as parameters for the AI
 	 */
-	private static final float[] BASIC_W_COLS = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-	private static final float[] BASIC_W_DIFF = {-1,-1,-1,-1,-1,-1,-1,-1,-1};
+	private static final float[] DUMBS_WEIGHTS = new float[StartingSolver.LENGTH];
+	private static final float[] BASICS_WEIGHTS = {
+			0,								//weight 0
+			-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	//columns weights
+			-1,-1,-1,-1,-1,-1,-1,-1,-1,		//differences between columns weights
+			-1,								//
+			-50
+	};
 	
 	
 	/*
 	 * Solvers: different AI with different parameters
 	 * 
 	 */
-	public static final StartingSolver DUMB_SOLVER = new StartingSolver();
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
-	public static final StartingSolver BASIC_SOLVER = new StartingSolver(1, BASIC_W_COLS,BASIC_W_DIFF, -1, -50);
+	public static final StartingSolver BASIC_SOLVER = new StartingSolver();
 
 	
 	/**
@@ -25,13 +28,19 @@ public class PlayerSkeleton {
 	 */
 	public static interface TetrisSolver {
 		
+		
 	    /**
 	     * Return the best move given the current state of the Tetris board
 	     * @param s
 	     * @param legalMoves
 	     * @return
 	     */
-	    public int pickMove(State s, int[][] legalMoves);
+	    public int pickMove(State s, int[][] legalMoves, float[] weights);
+	    
+	    /**
+	     * @return the number of weight used by the solver
+	     */
+	    public int weightsLength();
 	    
 	    /**
 	     * Create a new State of the game after the selected move
@@ -74,8 +83,13 @@ public class PlayerSkeleton {
 	public static class RandomSolver implements TetrisSolver {
 
 		@Override
-		public int pickMove(State s, int[][] legalMoves) {
+		public int pickMove(State s, int[][] legalMoves, float[] w) {
 			return (int) (Math.random()*legalMoves.length);
+		}
+
+		@Override
+		public int weightsLength() {
+			return 0;
 		}
 
 	}
@@ -87,60 +101,39 @@ public class PlayerSkeleton {
 	 *
 	 */
 	public static class StartingSolver implements TetrisSolver{
-
-		private final float weight0;
-		private final float[] weightsColumnsHeights;
-		private final float[] weightsDifferencesColumns;
-		private final float weightMaximumHeight;
-		private final float weightHoles;
+		
+		public static final int LENGTH = State.COLS + State.COLS-1 + 3;
+		
+		private static final int INDICE_COLS_WEIGHTS = 1;
+		private static final int INDICE_COLS_DIFF_WEIGTHS = INDICE_COLS_WEIGHTS + State.COLS;
+		private static final int INDICE_MAX_HEIGHT_WEIGHT = INDICE_COLS_DIFF_WEIGTHS +State.COLS -1;
+		private static final int INDICE_HOLES_WEIGHT = INDICE_MAX_HEIGHT_WEIGHT +1;
+		
 		
 		/**
 		 * Default constructor, initialize all weights to 0
 		 */
-		public StartingSolver() {
-			this.weight0 =0;
-			this.weightsColumnsHeights =  new float[State.COLS];
-			this.weightsDifferencesColumns = new float[State.COLS-1];
-			this.weightHoles =0;
-			this.weightMaximumHeight =0;
-		}
-		
-		/**
-		 * 	Constructor initializing all weights
-		 * @param weight0
-		 * 		constant added to the heuristic
-		 * @param weigthsColumnsHeights
-		 * 		weights for every column height
-		 * @param weightsDifferencesColumns
-		 * 		weights of differences of heights between column
-		 * @param weightMaximumHeight
-		 * 		weights 
-		 * @param weightHoles
-		 */
-		public StartingSolver(float weight0 ,float[] weigthsColumnsHeights, float[] weightsDifferencesColumns,float weightMaximumHeight,float weightHoles){
-			this.weight0 = weight0;
-			this.weightsColumnsHeights = Arrays.copyOf(weigthsColumnsHeights, State.COLS);
-			this.weightsDifferencesColumns = Arrays.copyOf(weightsDifferencesColumns, State.COLS-1);
-			this.weightMaximumHeight = weightMaximumHeight;
-			this.weightHoles = weightHoles;
-		}
+		public StartingSolver() {}
 		
 
 		@Override
-		public int pickMove(State s, int[][] legalMoves) {
+		public int pickMove(State s, int[][] legalMoves, float[] w) {
+			if( w.length != LENGTH){
+				throw new IllegalArgumentException("wrong number of weights: "+ w.length+". Expected: "+LENGTH); 
+			}
 			float max = Float.NEGATIVE_INFINITY; 
 			int bestMove=0;
 			int n =0;
 			for(int[] move: legalMoves){
 				State next = TetrisSolver.nextState(s,move);
-				float heuristic = weight0;
+				float heuristic = w[0];
 				int maxHeight =0;
 				int holes =0;
 				for(int i=0; i<State.COLS; i++){
 					
 					//height
 					int height = next.getTop()[i];
-					heuristic += weightsColumnsHeights[i]*height;
+					heuristic += w[INDICE_COLS_WEIGHTS+i]*height;
 					if(height>maxHeight){
 						maxHeight = height;
 					}
@@ -152,14 +145,14 @@ public class PlayerSkeleton {
 						}
 					}
 				}
-				heuristic += holes*weightHoles;
-				heuristic += maxHeight*weightMaximumHeight;
+				heuristic += holes*w[INDICE_HOLES_WEIGHT];
+				heuristic += maxHeight*w[INDICE_MAX_HEIGHT_WEIGHT];
 				
 				//differences
 				for(int i=0; i<State.COLS-1; i++){
 					int diff =Math.abs(next.getTop()[i]-next.getTop()[i+1]);
 					
-					heuristic += weightsDifferencesColumns[i]*diff;
+					heuristic += w[INDICE_COLS_DIFF_WEIGTHS+i]*diff;
 				}
 				
 				if(next.lost){
@@ -174,6 +167,11 @@ public class PlayerSkeleton {
 			}
 			
 			return bestMove;
+		}
+
+		@Override
+		public int weightsLength() {
+			return LENGTH;
 		}
 
 	}
@@ -193,8 +191,9 @@ public class PlayerSkeleton {
 		State s = new State();
 		new TFrame(s);
 		TetrisSolver aI = BASIC_SOLVER;
+		long start = System.currentTimeMillis();
 		while(!s.hasLost()) {
-			s.makeMove(aI.pickMove(s,s.legalMoves()));
+			s.makeMove(aI.pickMove(s,s.legalMoves(),BASICS_WEIGHTS));
 			s.draw();
 			s.drawNext(0,0);
 			try {
@@ -203,6 +202,9 @@ public class PlayerSkeleton {
 				e.printStackTrace();
 			}
 		}
+		long end = System.currentTimeMillis();
+		long diff = end-start;
+		System.out.println("it takes "+ diff + " milliseconds");
 		System.out.println("You have completed "+s.getRowsCleared()+" rows.");
 	}
 	
