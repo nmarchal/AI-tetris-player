@@ -17,6 +17,10 @@ public final class ArrangedSALearner implements TetrisLearner {
 		try (Writer writer = new BufferedWriter(new FileWriter("data.csv",false))) {
 		
 		float[] weights = new float[solver.weightsLength()];
+		for(int i =0; i<weights.length; i++){
+			writer.write("w"+i+";");
+		}
+		writer.write("next Value; value;\n");
 		
 		int value = TetrisLearner.solveAvg(solver, weights , maxLine,averageGamePlayed,0);
 		for(int n =0;n<duration ;n++){
