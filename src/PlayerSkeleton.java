@@ -16,8 +16,28 @@ public class PlayerSkeleton {
 	private static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
 	private static final float[] BEST_WEIGHTS = {
-			4.0f, 0.0f, -2.0f, -1.0f, -2.0f, -1.0f, 1.0f, -4.0f, 0.0f, -2.0f, 1.0f, -2.0f, -1.0f, -1.0f, -2.0f, -2.0f,
-			-3.0f, -3.0f, -1.0f, -3.0f, -1.0f, -10.0f 
+			3.6834285f , 
+			-0.08742851f , 
+			0.12600005f , 
+			0.25942862f , 
+			-0.49471426f , 
+			-1.0981429f , 
+			-0.53199995f , 
+			-0.4834286f , 
+			-0.43842834f , 
+			-0.775f , 
+			1.2192858f , 
+			-4.014143f , 
+			-1.6227142f , 
+			-2.0007143f , 
+			-2.5574288f , 
+			-2.6869998f , 
+			-1.4731429f , 
+			-2.3311431f , 
+			-1.0488571f , 
+			-1.334f , 
+			-1.4882857f , 
+			-10.236428f ,
 	};
 	
 	
@@ -251,7 +271,7 @@ public class PlayerSkeleton {
 			int bestMove=0;
 			int n =0;
 			int d=depth;
-			while(max == Float.NEGATIVE_INFINITY) {
+			while(max == Float.NEGATIVE_INFINITY && d>=0) {
 				for(int[] move: legalMoves){
 					State next = TetrisSolver.nextState(s,move);
 					float heuristicValue = minmax(next, d, false, weights);

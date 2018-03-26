@@ -26,10 +26,11 @@ public final class ArrangedSALearner implements TetrisLearner {
 			for(int i =0;i<nParams; i++){
 				int ind = random.nextInt(solver.weightsLength());
 				boolean sign = random.nextInt(2)==1;
+				float tolWeight = 0.1f;
 				if(sign){
-					next[ind] += 1;
+					next[ind] += 1 + ((float)n/duration)*(tolWeight - 1);
 				}else{
-					next[ind] -= 1;
+					next[ind] -= 1 + ((float)n/duration)*(tolWeight - 1);
 				}
 			}
 			int nextVal =  TetrisLearner.solveAvg(solver, next , maxLine,averageGamePlayed,value);
@@ -40,7 +41,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 			}else{
 				if (value > 30) {
 					double r = random.nextDouble();
-					double proba =Math.exp(-(double)(Math.pow( (double) (value - nextVal+1)/value,3) * Math.pow(n, 1.3)));
+					double proba =Math.exp(-(double)(Math.pow( (double) (value - nextVal+1)/value,3) * Math.pow(n, 1.2)));
 					if (proba > 0.5) {
 						proba = 0.5 ;
 						}
