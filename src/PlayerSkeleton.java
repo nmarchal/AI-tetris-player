@@ -47,7 +47,7 @@ public class PlayerSkeleton {
 	 */
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
 	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
-	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
+	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 4);
 	
 	/**
 	 * Interface of heuristic
@@ -275,7 +275,7 @@ public class PlayerSkeleton {
 				int n =0;
 				for(int[] move: legalMoves){
 					State next = TetrisSolver.nextState(s,move);
-					float heuristicValue = minmax(next, d, false, weights);
+					float heuristicValue = minmax(next, d, false, weights,max,Float.POSITIVE_INFINITY);
 					
 					if(heuristicValue>max){
 						max = heuristicValue;
@@ -304,7 +304,7 @@ public class PlayerSkeleton {
 		 * 		weights 
 		 * @return the MINMAX best heuristic value
 		 */
-		private float minmax(State s,int d,boolean maximizing,float[] weights){
+		private float minmax(State s,int d,boolean maximizing,float[] weights ,float alpha, float beta){
 			if(s.hasLost()){
 				return Float.NEGATIVE_INFINITY;
 			}
@@ -316,9 +316,15 @@ public class PlayerSkeleton {
 				float best = Float.NEGATIVE_INFINITY;
 				for(int[] move :s.legalMoves()){
 					State next = TetrisSolver.nextState(s, move);
-					float v = minmax(next, d-1, false, weights);
+					float v = minmax(next, d-1, false, weights, alpha, beta);
 					if(v>best){
 						best = v;
+					}
+					if(alpha<v){
+						alpha = v;
+					}
+					if(beta<= alpha){
+						break;
 					}
 				}
 				return best;
@@ -326,9 +332,15 @@ public class PlayerSkeleton {
 				float best = Float.POSITIVE_INFINITY;
 				for(int i = 0; i<State.N_PIECES; i++){
 					s.nextPiece =i;
-					float v = minmax(s, d-1, true, weights);
+					float v = minmax(s, d-1, true, weights,alpha,beta);
 					if(v<best){
 						best = v;
+					}
+					if(v<beta){
+						beta = v;
+					}
+					if(beta <= alpha){
+						break;
 					}
 				}
 				return best;

@@ -34,7 +34,18 @@ public final class ArrangedSALearner implements TetrisLearner {
 				}
 			}
 			int nextVal =  TetrisLearner.solveAvg(solver, next , maxLine,averageGamePlayed,value);
-			writer.write(nextVal + ";");
+			
+			/*
+			 * Write data in file
+			 */
+			for(float w:next){
+				writer.write(w+";");
+			}
+			writer.write(nextVal + ";"+value+"\n");
+			
+			/*
+			 * 
+			 */
 			if(nextVal > value){
 				value = nextVal;
 				weights = next.clone();
