@@ -32,7 +32,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 				boolean sign = random.nextInt(2)==1;
 				float tolWeight = 0.1f;
 				if(sign){
-					next[ind] += 1 + ((float)n/duration)*(tolWeight - 1);
+					next[ind] += Math.exp(-Math.pow((double)n, 1.2)/duration);
 				}else{
 					next[ind] -= 1 + ((float)n/duration)*(tolWeight - 1);
 				}
@@ -56,7 +56,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 			}else{
 				if (value > 30) {
 					double r = random.nextDouble();
-					double proba =Math.exp(-(double)(Math.pow( (double) (value - nextVal+1)/value,3) * Math.pow(n, 1.2)));
+					double proba =Math.exp(-(double)(Math.pow( (double) (value - nextVal+1)/value,3.1) * Math.pow(n, 1.2)));
 					if (proba > 0.5) {
 						proba = 0.5 ;
 						}

@@ -15,30 +15,37 @@ public class PlayerSkeleton {
 	};
 	private static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
-	private static final float[] BEST_WEIGHTS = {
-			3.6834285f , 
-			-0.08742851f , 
-			0.12600005f , 
-			0.25942862f , 
-			-0.49471426f , 
-			-1.0981429f , 
-			-0.53199995f , 
-			-0.4834286f , 
-			-0.43842834f , 
-			-0.775f , 
-			1.2192858f , 
-			-4.014143f , 
-			-1.6227142f , 
-			-2.0007143f , 
-			-2.5574288f , 
-			-2.6869998f , 
-			-1.4731429f , 
-			-2.3311431f , 
-			-1.0488571f , 
-			-1.334f , 
-			-1.4882857f , 
-			-10.236428f ,
+	private static final float[] BEST_WEIGHTS_BEFORE = {
+			-2.3854287f , 
+			1.5162857f , 
+			-1.6114286f , 
+			-0.5400001f , 
+			0.40600008f , 
+			-0.49857128f , 
+			-0.20057154f , 
+			-0.73057157f , 
+			0.38442856f , 
+			0.5682857f , 
+			-0.4564284f , 
+			-2.1848571f , 
+			-1.4648573f , 
+			-1.7904286f , 
+			-1.0447145f , 
+			-1.3838573f , 
+			-0.9511427f , 
+			-2.3995717f , 
+			-0.5554285f , 
+			-3.0382855f , 
+			-0.64285725f , 
+			-8.159857f ,  // nicolas 15'000
 	};
+	
+	private static final float[] BEST_WEIGHTS = {
+		 -2.064638f, 0.99241304f, -0.9892719f, -0.022724867f, -0.9527318f,
+		-0.021005929f, 0.012356937f, -0.016091943f, -0.0025559664f, -1.0049679f, 0.9978579f, -2.940033f, -1.950203f,
+		-2.0007744f, -1.956233f, -1.9986322f, -1.9524348f, -1.9964991f, -1.97714f, -2.9492042f, -0.009090185f,
+		-9.940321f 
+	}; // loic 80'000
 	
 	
 	/*
@@ -47,7 +54,7 @@ public class PlayerSkeleton {
 	 */
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
 	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
-	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 4);
+	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
 	
 	/**
 	 * Interface of heuristic
@@ -356,18 +363,21 @@ public class PlayerSkeleton {
 	 */
 	public static void main(String[] args) {
 		State s = new State();
-		new TFrame(s);
+		//new TFrame(s);
 		TetrisSolver aI = MINMAX_SOLVER;
 		long start = System.currentTimeMillis();
 		while(!s.hasLost()) {
 			s.makeMove(aI.pickMove(s,s.legalMoves(),BEST_WEIGHTS));
-			s.draw();
-			s.drawNext(0,0);
+			//s.draw();
+			//s.drawNext(0,0);
 			/*try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
+			if (s.getRowsCleared()% 1000 == 0) {
+				System.out.println(" lines cleared " + s.getRowsCleared() );
+			}
 		}
 		long end = System.currentTimeMillis();
 		long diff = end-start;
