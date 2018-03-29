@@ -46,6 +46,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 				writer.write(w+";");
 			}
 			writer.write(nextVal + ";"+value+"\n");
+			writer.flush();
 			
 			/*
 			 * 
