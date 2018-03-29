@@ -17,17 +17,17 @@ public class Evaluate_Solver {
 	public static void main(String[] args) {
 		try(Writer writer = new BufferedWriter(new FileWriter("performances.csv",false))){
 
-			TetrisSolver aI = new MinMaxSolver(new GivenHeuristic(), 4);
+			TetrisSolver aI = new MinMaxSolver(new GivenHeuristic(), 2);
 			int test_number = 0;
 			while(true){
 				State s = new State();
-				int i =10_000;
+				int i =1000;
 				
 				while (!s.hasLost()) {
 					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS));
 					if(i < s.getRowsCleared() ){
 						System.out.println(s.getRowsCleared());
-						i+= 10_000;
+						i+= 1000;
 					}
 				}
 				
