@@ -5,16 +5,17 @@ public class PlayerSkeleton {
 	/*
 	 * Constants used as parameters for the AI
 	 */
-	private static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
-	private static final float[] BASICS_WEIGHTS = {
+	public static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
+	public static final float[] BASICS_WEIGHTS = {
 			0,								//weight 0
 			-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	//columns weights
 			-1,-1,-1,-1,-1,-1,-1,-1,-1,		//differences between columns weights
 			-1,								//
 			-50
 	};
-	private static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
+	public static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
+	
 	private static final float[] BEST_WEIGHTS_BEFORE = {
 			-2.3854287f , 
 			1.5162857f , 
@@ -38,9 +39,34 @@ public class PlayerSkeleton {
 			-3.0382855f , 
 			-0.64285725f , 
 			-8.159857f ,  // nicolas 15'000
+	} ;
+	
+	public static final float[] BEST_WEIGHTS = {
+			3.6834285f , 
+			-0.08742851f , 
+			0.12600005f , 
+			0.25942862f , 
+			-0.49471426f , 
+			-1.0981429f , 
+			-0.53199995f , 
+			-0.4834286f , 
+			-0.43842834f , 
+			-0.775f , 
+			1.2192858f , 
+			-4.014143f , 
+			-1.6227142f , 
+			-2.0007143f , 
+			-2.5574288f , 
+			-2.6869998f , 
+			-1.4731429f , 
+			-2.3311431f , 
+			-1.0488571f , 
+			-1.334f , 
+			-1.4882857f , 
+			-10.236428f ,
 	};
 	
-	private static final float[] BEST_WEIGHTS = {
+	private static final float[] BEST_WEIGHTS_1 = {
 		 -2.064638f, 0.99241304f, -0.9892719f, -0.022724867f, -0.9527318f,
 		-0.021005929f, 0.012356937f, -0.016091943f, -0.0025559664f, -1.0049679f, 0.9978579f, -2.940033f, -1.950203f,
 		-2.0007744f, -1.956233f, -1.9986322f, -1.9524348f, -1.9964991f, -1.97714f, -2.9492042f, -0.009090185f,
