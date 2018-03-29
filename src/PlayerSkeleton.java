@@ -5,17 +5,17 @@ public class PlayerSkeleton {
 	/*
 	 * Constants used as parameters for the AI
 	 */
-	private static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
-	private static final float[] BASICS_WEIGHTS = {
+	public static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
+	public static final float[] BASICS_WEIGHTS = {
 			0,								//weight 0
 			-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	//columns weights
 			-1,-1,-1,-1,-1,-1,-1,-1,-1,		//differences between columns weights
 			-1,								//
 			-50
 	};
-	private static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
+	public static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
-	private static final float[] BEST_WEIGHTS = {
+	public static final float[] BEST_WEIGHTS = {
 			3.6834285f , 
 			-0.08742851f , 
 			0.12600005f , 
