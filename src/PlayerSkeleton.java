@@ -1,5 +1,8 @@
 package src;
 
+import java.util.*;
+import java.util.stream.IntStream;
+
 public class PlayerSkeleton {
 
 	/*
@@ -49,7 +52,6 @@ public class PlayerSkeleton {
 		-9.940321f 
 	}; // loic 80'000
 	
-	
 	/*
 	 * Solvers: different AI with different parameters
 	 * 
@@ -57,7 +59,8 @@ public class PlayerSkeleton {
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
 	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
 	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
-	
+	public static final MinMaxSolver EXPERIMENT_SOLVER = new MinMaxSolver(new ExperimentalHeuristics(), 2);
+
 	/**
 	 * Interface of heuristic
 	 *
@@ -91,11 +94,15 @@ public class PlayerSkeleton {
 
 	/**
 	 * class representing the heuristic given ins the projects instruction
-	 *
+	 * 0 -> bias
+	 * next num_cols -> height of walls
+	 * next num_cols -> difference between adj columns
+	 * next 1 -> max col height
+	 * next 1 -> num holes in wall
 	 */
 	public static class GivenHeuristic implements Heuristic{
 
-		public static final int LENGTH = State.COLS + State.COLS-1 + 3;
+		private static final int LENGTH = State.COLS + State.COLS-1 + 3;
 		
 		private static final int INDICE_COLS_WEIGHTS = 1;
 		private static final int INDICE_COLS_DIFF_WEIGTHS = INDICE_COLS_WEIGHTS + State.COLS;
@@ -144,6 +151,7 @@ public class PlayerSkeleton {
 			return LENGTH;
 		}
 
+		@Override
 		public float[] featureValues (State state) {
 			float[] values = new float[LENGTH];
 			int maxHeight = 0;
@@ -175,7 +183,179 @@ public class PlayerSkeleton {
 		}
 		
 	}
-	
+
+	/**
+	 * Uses both given heuristics & new heuristics
+	 */
+	public static class ExperimentalHeuristics extends GivenHeuristic {
+
+		private GroupedHoles gh = new GroupedHoles();
+		private SumOfHeights sh = new SumOfHeights();
+		private MaxHeightDifference hd = new MaxHeightDifference();
+		private SquaresAboveHoles sah = new SquaresAboveHoles();
+
+		@Override
+		public float compute(State next, float[] w) {
+			float oldScore = super.compute(next, w);
+
+			int nextIndex = super.weightsLength();
+			float newScore = 0;
+
+			// grouped holes
+			newScore += gh.compute(next) * w[nextIndex];
+			nextIndex++;
+
+			// sum of heights
+			newScore += sh.compute(next) * w[nextIndex];
+			nextIndex++;
+
+			// max difference
+			newScore += hd.compute(next) * w[nextIndex];
+			nextIndex++;
+
+			// squares above holes
+			newScore += sah.compute(next) * w[nextIndex];
+			nextIndex++;
+
+			if (next.hasLost()) newScore = Float.NEGATIVE_INFINITY;
+
+			return oldScore + newScore;
+		}
+
+		@Override
+		public int weightsLength() {
+			return super.weightsLength() + 4;
+		}
+
+		@Override
+		public float[] featureValues(State state) {
+			float[] oldValues = super.featureValues(state);
+
+			float[] newValues = new float[oldValues.length + weightsLength()];
+			System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
+
+			int nextIndex = oldValues.length;
+			newValues[nextIndex] = gh.compute(state);
+			nextIndex++;
+
+			newValues[nextIndex] = sh.compute(state);
+			nextIndex++;
+
+			newValues[nextIndex] = hd.compute(state);
+			nextIndex++;
+
+			newValues[nextIndex] = sah.compute(state);
+			nextIndex++;
+
+			return newValues;
+		}
+	}
+
+	/**
+	 * Discourage adding holes far from the surface
+	 */
+	public static class SquaresAboveHoles {
+		// sum of (number of squares from lowest hole to highest filled square in each column)
+		public float compute(State next) {
+			int count = 0;
+			for (int c = 0; c < State.COLS; c++) {
+				int end = next.getTop()[c];
+				for (int r = 0; r < end; r++) {
+					boolean isHole = next.getField()[r][c] == 0;
+					if (isHole) {
+						count += end - r;
+						break;
+					}
+				}
+			}
+			return count;
+		}
+	}
+
+	/**
+	 * Hopefully encourages grouped holes more than separated holes
+	 */
+	public static class GroupedHoles {
+		// number of grouped holes (all connected holes make up 1 group)
+		public float compute(State next) {
+			int[][] grid = next.getField().clone();
+			// fill up all non-holes
+
+			// for each col, set all squares above to 1
+			for (int c = 0; c < State.COLS; c++) {
+				int start = next.getTop()[c];
+				for (int r = start; r < State.ROWS; r++) {
+					grid[r][c] = 1;
+				}
+			}
+
+			// count number of hole groups (all connected holes make up 1 group)
+			int numGroups = 0;
+			for (int c = 0; c < State.COLS; c++) {
+				for (int r = 0; r < next.getTop()[c]; r++) {
+					boolean isNotHole = grid[r][c] > 0;
+					if (isNotHole) continue;
+					numGroups++;
+					fillNeighbors(grid, r, c);
+				}
+			}
+
+			return numGroups;
+		}
+
+		/**
+		 * Fills the given coordinate & all connected neighbors with 1
+		 */
+		private void fillNeighbors(int[][] grid, int y, int x) {
+			if (grid[y][x] == 0) {
+				grid[y][x] = 1;
+
+				// explore up, down, left, right recursively
+				int left = x-1;
+				int right = x+1;
+				int down = y-1;
+				int up = y+1;
+				if (left >= 0) fillNeighbors(grid, y, left);
+				if (right < grid[0].length) fillNeighbors(grid, y, right);
+				if (down >= 0) fillNeighbors(grid, down, x);
+				if (up < grid.length) fillNeighbors(grid, up, x);
+			}
+		}
+	}
+
+	/**
+	 * Equivalent to 'num lines removed'
+	 */
+	public static class SumOfHeights {
+		public float compute(State next) {
+			int sum = 0;
+			for (int i = 0; i < State.COLS; i++) {
+				sum += next.getTop()[i];
+			}
+			return sum;
+		}
+	}
+
+	/**
+	 * Encourage flattening the field
+	 */
+	public static class MaxHeightDifference {
+		public float compute(State next) {
+			List<Integer> tops = Arrays.asList(box(next.getTop()));
+			float highest = Collections.max(tops);
+			float lowest = Collections.min(tops);
+			return (highest - lowest);
+		}
+
+		private static Integer[] box(int[] ints) {
+			Integer[] box = new Integer[ints.length];
+			for (int i = 0; i < box.length; i++) {
+				box[i] = ints[i];
+			}
+			return box;
+		}
+	}
+
 	/**
 	 * Interface that represent an AI for Tetris
 	 */
