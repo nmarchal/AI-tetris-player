@@ -1,7 +1,6 @@
 package src;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class PlayerSkeleton {
 
@@ -59,7 +58,7 @@ public class PlayerSkeleton {
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
 	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
 	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
-	public static final MinMaxSolver EXPERIMENT_SOLVER = new MinMaxSolver(new ExperimentalHeuristics(), 2);
+	public static final TetrisSolver EXPERIMENT_SOLVER = new StartingSolver(new ExperimentalHeuristics());
 
 	/**
 	 * Interface of heuristic
@@ -342,8 +341,8 @@ public class PlayerSkeleton {
 	public static class MaxHeightDifference {
 		public float compute(State next) {
 			List<Integer> tops = Arrays.asList(box(next.getTop()));
-			float highest = Collections.max(tops);
-			float lowest = Collections.min(tops);
+			int highest = Collections.max(tops);
+			int lowest = Collections.min(tops);
 			return (highest - lowest);
 		}
 
