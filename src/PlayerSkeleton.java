@@ -74,6 +74,15 @@ public class PlayerSkeleton {
 		 */
 		public float compute(State next,float[] w);
 		
+		/**
+		 * Gives an approximation of the current state based on the heuristic
+		 * @param state
+		 * 		The state to approximate
+		 * @return
+		 * 		The vector of feature values at the state
+		 */
+		public float[] featureValues(State state);
+		
 		 /**
 	     * @return the number of weight used by the solver
 	     */
@@ -134,6 +143,36 @@ public class PlayerSkeleton {
 		public int weightsLength() {
 			return LENGTH;
 		}
+
+		public float[] featureValues (State state) {
+			float[] values = new float[LENGTH];
+			int maxHeight = 0;
+			int holes = 0;
+			for(int i=0; i<State.COLS; i++){
+				//height
+				int height = state.getTop()[i];
+				values[i] = height;
+				if(height>maxHeight){
+					maxHeight = height;
+				}
+				
+				//holes
+				for(int j=0; j<height-1;j++){
+					if(state.getField()[j][i]==0){
+						holes++;
+					}
+				}
+			}
+			values[LENGTH - 1] = holes;
+			values[LENGTH - 2] = maxHeight;
+			
+			//differences
+			for(int i=0; i<State.COLS-1; i++){
+				int diff = Math.abs(state.getTop()[i]-state.getTop()[i+1]);
+				values[State.COLS + i] = diff;
+			}
+			return values;
+		}
 		
 	}
 	
@@ -150,6 +189,16 @@ public class PlayerSkeleton {
 	     * @return
 	     */
 	    public int pickMove(State s, int[][] legalMoves, float[] weights);
+	    
+	    /**
+	     * Return an approximation of the current state as a vector of the 
+	     * features of the heuristic used by this solver, if any.
+	     * @param s
+	     * 		The state to approximate
+	     * @return
+	     * 		The feature vector of the state
+	     */
+	    public float[] featureValues(State s);
 	    
 	    /**
 	     * @return the number of weight used by the solver
@@ -206,6 +255,10 @@ public class PlayerSkeleton {
 			return 0;
 		}
 
+		public float[] featureValues (State s) {
+			return null;
+		}
+
 	}
 	
 	
@@ -250,6 +303,11 @@ public class PlayerSkeleton {
 		@Override
 		public int weightsLength() {
 			return heuristic.weightsLength();
+		}
+
+
+		public float[] featureValues (State s) {
+			return heuristic.featureValues(s);
 		}
 
 	}
@@ -354,6 +412,10 @@ public class PlayerSkeleton {
 				}
 				return best;
 			}
+		}
+
+		public float[] featureValues (State s) {
+			return heuristic.featureValues(s);
 		}
 	}
 	
