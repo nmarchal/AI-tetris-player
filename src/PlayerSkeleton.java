@@ -1,6 +1,8 @@
 package src;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PlayerSkeleton {
 
@@ -439,9 +441,7 @@ public class PlayerSkeleton {
 		}
 
 	}
-	
-	
-	
+
 	/**
 	 * Solver using the heuristic function at depth 1
 	 *
@@ -456,27 +456,25 @@ public class PlayerSkeleton {
 			this.heuristic = heuristic;
 		}
 		
-
 		@Override
 		public int pickMove(State s, int[][] legalMoves, float[] w) {
 			if( w.length != weightsLength()){
 				throw new IllegalArgumentException("wrong number of weights: "+ w.length+". Expected: "+weightsLength()); 
 			}
-			float max = Float.NEGATIVE_INFINITY; 
-			int bestMove=0;
-			int n =0;
-			for(int[] move: legalMoves){
-				State next = TetrisSolver.nextState(s,move);
-				float heuristicValue = heuristic.compute(next, w);
-				
-				if(heuristicValue>max){
-					max = heuristicValue;
-					bestMove = n;
-				}
-				n++;
-			}
-			
-			return bestMove;
+			List<Float> values = Arrays.stream(legalMoves)
+							.parallel()
+							.map(move -> getHeuristicValue(move, s, w))
+							.collect(Collectors.toList());
+
+			int maxIdx = IntStream.range(0, values.size())
+							.reduce(0, (i,j) -> values.get(i) > values.get(j) ? i : j);
+
+			return maxIdx;
+		}
+
+		private float getHeuristicValue(int[] move, State state, float[] weights) {
+			State next = TetrisSolver.nextState(state, move);
+			return heuristic.compute(next, weights);
 		}
 
 		@Override
