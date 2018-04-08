@@ -179,6 +179,21 @@ public class PlayerSkeleton {
 			int lowest = Collections.min(tops);
 			return (highest - lowest);
 		}
+	
+		
+		public static int holes(State s){
+			int holes =0;
+			for(int i=0; i<State.COLS; i++){
+				int height = s.getTop()[i];
+				for(int j=0; j<height-1;j++){
+					if(s.getField()[j][i]==0){
+						holes++;
+					}
+				}
+			}
+			return holes;
+		}
+	
 	}
 	
 	/**
@@ -232,27 +247,26 @@ public class PlayerSkeleton {
 		
 		@Override
 		public float compute(State state, float[] weights) {
+
+			if(state.lost){
+				return Float.NEGATIVE_INFINITY;
+			}
+			
 			float heuristicValue = weights[0];
 			int maxHeight =0;
-			int holes =0;
+			
 			for(int i=0; i<State.COLS; i++){
-				
 				//height
 				int height = state.getTop()[i];
 				heuristicValue += weights[INDICE_COLS_WEIGHTS+i]*height;
 				if(height>maxHeight){
 					maxHeight = height;
 				}
-				
-				//holes
-				for(int j=0; j<height-1;j++){
-					if(state.getField()[j][i]==0){
-						holes++;
-					}
-				}
 			}
-			heuristicValue += holes*weights[INDICE_HOLES_WEIGHT];
 			heuristicValue += maxHeight*weights[INDICE_MAX_HEIGHT_WEIGHT];
+			
+			//holes
+			heuristicValue += HeuristicTool.holes(state)*weights[INDICE_HOLES_WEIGHT];
 			
 			//differences
 			for(int i=0; i<State.COLS-1; i++){
@@ -261,9 +275,6 @@ public class PlayerSkeleton {
 				heuristicValue += weights[INDICE_COLS_DIFF_WEIGTHS+i]*diff;
 			}
 			
-			if(state.lost){
-				heuristicValue = Float.NEGATIVE_INFINITY;
-			}
 			return heuristicValue;
 		}
 
