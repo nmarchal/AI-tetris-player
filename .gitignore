@@ -7,5 +7,6 @@
 .classpath
 .idea/
 CS3243TeamProject.iml
-
+*.csv
 out/
+bestRes.txt

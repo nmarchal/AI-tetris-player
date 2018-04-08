@@ -10,6 +10,8 @@ public class PlayerSkeleton {
 	 * Constants used as parameters for the AI
 	 */
 	public static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
+	
+	//Manually entered weights
 	public static final float[] BASICS_WEIGHTS = {
 			0,								//weight 0
 			-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	//columns weights
@@ -17,6 +19,8 @@ public class PlayerSkeleton {
 			-1,								//
 			-50
 	};
+	
+	//FIXME This constant is a draft of previous result, delete this before submitting the code
 	public static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
 	
@@ -60,8 +64,123 @@ public class PlayerSkeleton {
 	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
 	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
 	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
+	public static final MinMaxSolver DEEPER_MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 3);
 	public static final TetrisSolver EXPERIMENT_SOLVER = new StartingSolver(new ExperimentalHeuristics());
 
+	
+	
+	
+	/**
+	 * Tool interface containing useful functions used by the heuristics
+	 *
+	 */
+	public static interface HeuristicTool{
+		
+		/**
+		 * compute the number of filled tiles above every holes
+		 * @param s the state of the game
+		 * @return number of filled tiles above every holes
+		 */
+		public static int squaresAboveHoles(State s){
+			int count = 0;
+			for (int c = 0; c < State.COLS; c++) {
+				int end = s.getTop()[c];
+				for (int r = 0; r < end; r++) {
+					boolean isHole = s.getField()[r][c] == 0;
+					if (isHole) {
+						count += end - r;
+						break;
+					}
+				}
+			}
+			return count;
+		}
+		
+		/**
+		 * count the number of grouped holes in the state
+		 * @param s the state of the game
+		 * @return number of grouped holes.
+		 */
+		public static int groupedHoles(State s){
+			int[][] grid = s.getField().clone();
+			// fill up all non-holes
+
+			// for each col, set all squares above to 1
+			for (int c = 0; c < State.COLS; c++) {
+				int start = s.getTop()[c];
+				for (int r = start; r < State.ROWS; r++) {
+					grid[r][c] = 1;
+				}
+			}
+
+			// count number of hole groups (all connected holes make up 1 group)
+			int numGroups = 0;
+			for (int c = 0; c < State.COLS; c++) {
+				for (int r = 0; r < s.getTop()[c]; r++) {
+					boolean isNotHole = grid[r][c] > 0;
+					if (isNotHole) continue;
+					numGroups++;
+					fillNeighbors(grid, r, c);
+				}
+			}
+
+			return numGroups;
+		}
+
+		/**
+		 * help function, that fill the neighbors of a given coordinate
+		 * @param grid 
+		 * @param y coordinate y
+		 * @param x coordinate x
+		 */
+		public static void fillNeighbors(int[][] grid, int y, int x) {
+			if (grid[y][x] == 0) {
+				grid[y][x] = 1;
+
+				// explore up, down, left, right recursively
+				int left = x-1;
+				int right = x+1;
+				int down = y-1;
+				int up = y+1;
+				if (left >= 0) fillNeighbors(grid, y, left);
+				if (right < grid[0].length) fillNeighbors(grid, y, right);
+				if (down >= 0) fillNeighbors(grid, down, x);
+				if (up < grid.length) fillNeighbors(grid, up, x);
+			}
+		}
+		
+		
+		/**
+		 * Compute the sum of heights
+		 * @param s the state of the game
+		 * @return the sum
+		 */
+		public static int sumOfHeights(State s){
+			int sum = 0;
+			for (int i = 0; i < State.COLS; i++) {
+				sum += s.getTop()[i];
+			}
+			return sum;
+		}
+		
+		
+		/**
+		 * compute the difference between the highest column and the smallest
+		 * @param s the state of the game
+		 * @return 
+		 */
+		public static int maxHeightsDifference(State s){
+			Integer[] box = new Integer[s.getTop().length];
+			for (int i = 0; i < box.length; i++) {
+				box[i] = s.getTop()[i];
+			}
+			List<Integer> tops = Arrays.asList(box);
+			int highest = Collections.max(tops);
+			int lowest = Collections.min(tops);
+			return (highest - lowest);
+		}
+	}
+	
 	/**
 	 * Interface of heuristic
 	 *
@@ -69,6 +188,7 @@ public class PlayerSkeleton {
 	public static interface Heuristic {
 		
 		/**
+		 * 	Compute the heuristic value of a state
 		 * @param next
 		 * 		The state to with the heuristic to compute
 		 * @param w
@@ -190,11 +310,6 @@ public class PlayerSkeleton {
 	 */
 	public static class ExperimentalHeuristics extends GivenHeuristic {
 
-		private GroupedHoles gh = new GroupedHoles();
-		private SumOfHeights sh = new SumOfHeights();
-		private MaxHeightDifference hd = new MaxHeightDifference();
-		private SquaresAboveHoles sah = new SquaresAboveHoles();
-
 		@Override
 		public float compute(State next, float[] w) {
 			float oldScore = super.compute(next, w);
@@ -203,19 +318,19 @@ public class PlayerSkeleton {
 			float newScore = 0;
 
 			// grouped holes
-			newScore += gh.compute(next) * w[nextIndex];
+			newScore += HeuristicTool.groupedHoles(next) * w[nextIndex];
 			nextIndex++;
 
 			// sum of heights
-			newScore += sh.compute(next) * w[nextIndex];
+			newScore += HeuristicTool.sumOfHeights(next) * w[nextIndex];
 			nextIndex++;
 
 			// max difference
-			newScore += hd.compute(next) * w[nextIndex];
+			newScore += HeuristicTool.maxHeightsDifference(next) * w[nextIndex];
 			nextIndex++;
 
 			// squares above holes
-			newScore += sah.compute(next) * w[nextIndex];
+			newScore += HeuristicTool.squaresAboveHoles(next) * w[nextIndex];
 			nextIndex++;
 
 			if (next.hasLost()) newScore = Float.NEGATIVE_INFINITY;
@@ -236,126 +351,22 @@ public class PlayerSkeleton {
 			System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
 
 			int nextIndex = oldValues.length;
-			newValues[nextIndex] = gh.compute(state);
+			newValues[nextIndex] = HeuristicTool.groupedHoles(state);
 			nextIndex++;
 
-			newValues[nextIndex] = sh.compute(state);
+			newValues[nextIndex] = HeuristicTool.sumOfHeights(state);
 			nextIndex++;
 
-			newValues[nextIndex] = hd.compute(state);
+			newValues[nextIndex] = HeuristicTool.maxHeightsDifference(state);
 			nextIndex++;
 
-			newValues[nextIndex] = sah.compute(state);
+			newValues[nextIndex] = HeuristicTool.squaresAboveHoles(state);
 			nextIndex++;
 
 			return newValues;
 		}
 	}
 
-	/**
-	 * Discourage adding holes far from the surface
-	 */
-	public static class SquaresAboveHoles {
-		// sum of (number of squares from lowest hole to highest filled square in each column)
-		public float compute(State next) {
-			int count = 0;
-			for (int c = 0; c < State.COLS; c++) {
-				int end = next.getTop()[c];
-				for (int r = 0; r < end; r++) {
-					boolean isHole = next.getField()[r][c] == 0;
-					if (isHole) {
-						count += end - r;
-						break;
-					}
-				}
-			}
-			return count;
-		}
-	}
-
-	/**
-	 * Hopefully encourages grouped holes more than separated holes
-	 */
-	public static class GroupedHoles {
-		// number of grouped holes (all connected holes make up 1 group)
-		public float compute(State next) {
-			int[][] grid = next.getField().clone();
-			// fill up all non-holes
-
-			// for each col, set all squares above to 1
-			for (int c = 0; c < State.COLS; c++) {
-				int start = next.getTop()[c];
-				for (int r = start; r < State.ROWS; r++) {
-					grid[r][c] = 1;
-				}
-			}
-
-			// count number of hole groups (all connected holes make up 1 group)
-			int numGroups = 0;
-			for (int c = 0; c < State.COLS; c++) {
-				for (int r = 0; r < next.getTop()[c]; r++) {
-					boolean isNotHole = grid[r][c] > 0;
-					if (isNotHole) continue;
-					numGroups++;
-					fillNeighbors(grid, r, c);
-				}
-			}
-
-			return numGroups;
-		}
-
-		/**
-		 * Fills the given coordinate & all connected neighbors with 1
-		 */
-		private void fillNeighbors(int[][] grid, int y, int x) {
-			if (grid[y][x] == 0) {
-				grid[y][x] = 1;
-
-				// explore up, down, left, right recursively
-				int left = x-1;
-				int right = x+1;
-				int down = y-1;
-				int up = y+1;
-				if (left >= 0) fillNeighbors(grid, y, left);
-				if (right < grid[0].length) fillNeighbors(grid, y, right);
-				if (down >= 0) fillNeighbors(grid, down, x);
-				if (up < grid.length) fillNeighbors(grid, up, x);
-			}
-		}
-	}
-
-	/**
-	 * Equivalent to 'num lines removed'
-	 */
-	public static class SumOfHeights {
-		public float compute(State next) {
-			int sum = 0;
-			for (int i = 0; i < State.COLS; i++) {
-				sum += next.getTop()[i];
-			}
-			return sum;
-		}
-	}
-
-	/**
-	 * Encourage flattening the field
-	 */
-	public static class MaxHeightDifference {
-		public float compute(State next) {
-			List<Integer> tops = Arrays.asList(box(next.getTop()));
-			int highest = Collections.max(tops);
-			int lowest = Collections.min(tops);
-			return (highest - lowest);
-		}
-
-		private static Integer[] box(int[] ints) {
-			Integer[] box = new Integer[ints.length];
-			for (int i = 0; i < box.length; i++) {
-				box[i] = ints[i];
-			}
-			return box;
-		}
-	}
 
 	/**
 	 * Interface that represent an AI for Tetris
@@ -366,8 +377,11 @@ public class PlayerSkeleton {
 	    /**
 	     * Return the best move given the current state of the Tetris board
 	     * @param s
+	     * 		the current state of the game
 	     * @param legalMoves
+	     * 		authorized moves that can be played on this state
 	     * @return
+	     * 		the index of the selected move from legalMoves
 	     */
 	    public int pickMove(State s, int[][] legalMoves, float[] weights);
 	    
@@ -501,6 +515,11 @@ public class PlayerSkeleton {
 		private final Heuristic heuristic;
 		private final int depth;
 		
+		/**
+		 * @param heur
+		 * @param depth
+		 * 		depth used for the minmax algorithm, 
+		 */
 		public MinMaxSolver(Heuristic heur,int depth) {
 			heuristic = heur;
 			this.depth = depth;
@@ -514,7 +533,7 @@ public class PlayerSkeleton {
 			float max = Float.NEGATIVE_INFINITY; 
 			int bestMove=0;
 
-			int d=depth;
+			int d=depth-1;
 			while(max == Float.NEGATIVE_INFINITY && d>=0) {
 				int n =0;
 				for(int[] move: legalMoves){
@@ -527,7 +546,7 @@ public class PlayerSkeleton {
 					}
 					n++;
 				}
-				d -= 2;
+				d -= 1;
 			}
 			return bestMove;
 		}
@@ -538,6 +557,9 @@ public class PlayerSkeleton {
 		}
 		
 		/**
+		 * Minmax algorithm applied for tetris.
+		 * 		Max tries to play the best legal move
+		 * 		Min tries to select the most annoying piece as the next piece playable
 		 * @param s
 		 * 		state of the node
 		 * @param d
@@ -576,7 +598,7 @@ public class PlayerSkeleton {
 				float best = Float.POSITIVE_INFINITY;
 				for(int i = 0; i<State.N_PIECES; i++){
 					s.nextPiece =i;
-					float v = minmax(s, d-1, true, weights,alpha,beta);
+					float v = minmax(s, d, true, weights,alpha,beta);
 					if(v<best){
 						best = v;
 					}
@@ -598,6 +620,7 @@ public class PlayerSkeleton {
 	
 	
 	
+	//FIXME we need to clean this before submitting
 	/**
 	 * MAIN FUNCTION
 	 * @param args

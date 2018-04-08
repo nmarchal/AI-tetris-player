@@ -3,6 +3,7 @@ package src;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Random;
 
 import src.PlayerSkeleton.TetrisSolver;
@@ -14,14 +15,15 @@ public final class ArrangedSALearner implements TetrisLearner {
 	@Override
 	public float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed) {
 
-		try (Writer writer = new BufferedWriter(new FileWriter("data.csv",false))) {
+		try (Writer writer = new BufferedWriter(new FileWriter("data.csv",false));
+				Writer writerBest = new BufferedWriter(new FileWriter("bestRes.txt",false))) {
 		
 		float[] weights = new float[solver.weightsLength()];
 		for(int i =0; i<weights.length; i++){
 			writer.write("w"+i+";");
 		}
 		writer.write("next Value; value;\n");
-		
+		int best =0;
 		int value = TetrisLearner.solveAvg(solver, weights , maxLine,averageGamePlayed,0);
 		for(int n =0;n<duration ;n++){
 			float[] next = weights.clone();
@@ -67,6 +69,12 @@ public final class ArrangedSALearner implements TetrisLearner {
 					}
 				}
 			}
+			if(best< value){
+				writerBest.write(Arrays.toString(weights));
+				best = value;
+				writerBest.flush();
+			}
+			
 			System.out.println(n+"/"+duration+" : "+value);
 			if(value >= maxLine){
 				break;
