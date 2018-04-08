@@ -61,9 +61,9 @@ public final class ArrangedSALearner implements TetrisLearner {
 					int ind = random.nextInt(solver.weightsLength());
 					boolean sign = random.nextInt(2) == 1;
 					if (sign) {
-						next[ind] += Math.exp(-Math.pow((double) n, 1.2) / duration); //FIXME which one?
+						next[ind] += Math.exp(-Math.pow((double) n, 1.2) / duration);
 					} else {
-						next[ind] -= 1 + ((float) n / duration) * 0.9; 
+						next[ind] -= Math.exp(-Math.pow((double) n, 1.2) / duration); 
 					}
 				}
 				
