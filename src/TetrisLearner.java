@@ -12,19 +12,24 @@ public interface TetrisLearner {
 	 * 	It tries man many different ways and improves himself
      * @param solver
      * 		The solver used to resolve Tetris
-     * @param startingWeights
-     * 		the starting weights used for the very first try of the learner
-     * @param duration
+	 * @param duration
      * 		represent the limit/time/iterations that have the learner before finishing
-     * @param maxLine
+	 * @param maxLine
      * 		represent the maximum number of line to remove in the tetris before considering it infinity
-     * @param averageGamePlayed
+	 * @param averageGamePlayed
      * 		The number of games taken to do an average
-     * @param lastValue
+	 * @param startingWeights TODO
+	 * @param startingWeights
+     * 		the starting weights used for the very first try of the learner
+	 * @param lastValue
      * 		the previous value of lines
      * @return
      */
-    public float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed);
+    public float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed, float[] startingWeights);
+    
+    public default float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed){
+    	return learn(solver,duration,maxLine,averageGamePlayed, new float[solver.weightsLength()]);
+    }
 
 
     public static int solveAvg(PlayerSkeleton.TetrisSolver solver,float[] weights, int maxLine, int n, int lastValue){
