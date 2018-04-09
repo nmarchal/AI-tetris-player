@@ -10,7 +10,8 @@ public class PlayerSkeleton {
 	 * Constants used as parameters for the AI
 	 */
 	public static final float[] DUMBS_WEIGHTS = new float[GivenHeuristic.LENGTH];
-	
+	public static final float[] DUMB_EXPERIMENTAL_WEIGHTS = new float[new ExperimentalHeuristics().weightsLength()];
+
 	//Manually entered weights
 	public static final float[] BASICS_WEIGHTS = {
 			0,								//weight 0
