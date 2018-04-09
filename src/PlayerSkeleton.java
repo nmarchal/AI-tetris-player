@@ -472,6 +472,9 @@ public class PlayerSkeleton {
 	 *
 	 */
 	public static final class StartingSolver implements TetrisSolver{
+
+		// for benchmarking
+		public int statesEvaluated = 0;
 		
 		private final Heuristic heuristic;
 		/**
@@ -490,6 +493,8 @@ public class PlayerSkeleton {
 							.parallel()
 							.map(move -> getHeuristicValue(move, s, w))
 							.collect(Collectors.toList());
+
+			statesEvaluated += values.size();
 
 			int maxIdx = IntStream.range(0, values.size())
 							.reduce(0, (i,j) -> values.get(i) > values.get(j) ? i : j);
