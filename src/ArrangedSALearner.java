@@ -16,6 +16,10 @@ public final class ArrangedSALearner implements TetrisLearner {
 	public float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed,
 			float[] startingWeights) {
 
+		if(solver.weightsLength() != startingWeights.length){
+			throw new IllegalArgumentException("You should enter "+solver.weightsLength()+" weights instead of "+startingWeights.length );
+		}
+		
 		/*
 		 * Open 2 files, 
 		 * 	1 for all the data, easier for us to understand what happen
@@ -29,12 +33,11 @@ public final class ArrangedSALearner implements TetrisLearner {
 			 * Initialization
 			 */
 			//current weights
-			float[] weights = startingWeights; // FIXME copy?
+			float[] weights = startingWeights.clone();
 			//current score corresponding to the weights
 			int value = TetrisLearner.solveAvg(solver, weights, maxLine, averageGamePlayed, 0);
 			//best value find so far
 			int best = value;
-			
 
 			//Initialize the file header
 			for (int i = 0; i < weights.length; i++) {

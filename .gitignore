@@ -10,3 +10,5 @@ CS3243TeamProject.iml
 *.csv
 out/
 bestRes.txt
+bestRes2.txt
+data.csv

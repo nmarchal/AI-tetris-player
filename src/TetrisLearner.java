@@ -1,7 +1,5 @@
 package src;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -65,7 +63,7 @@ public interface TetrisLearner {
 		int sum = 0;
 
 		// run num threads in parallel
-		int threads = 4;
+		final int threads = 4;
 
 		for (int i = 0; i < n; i+=threads) {
 			if(i==4 &&lastValue>50 && sum*4<i*lastValue*3){
