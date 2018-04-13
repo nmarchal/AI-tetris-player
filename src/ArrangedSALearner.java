@@ -11,7 +11,17 @@ import src.PlayerSkeleton.TetrisSolver;
 public final class ArrangedSALearner implements TetrisLearner {
 
 	private final Random random = new Random();
-
+	private final int start;
+	
+	public ArrangedSALearner() {
+		start =0;
+	}
+	
+	public ArrangedSALearner(int start) {
+		this.start = start ;
+	}
+	
+	
 	@Override
 	public float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed,
 			float[] startingWeights) {
@@ -50,7 +60,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 			 * Simulated Annealing
 			 * 		using n cycles
 			 */
-			for (int n = 0; n < duration; n++) {
+			for (int n = start; n < duration; n++) {
 				
 				/*
 				 * Set the next weights. 
