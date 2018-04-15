@@ -48,8 +48,8 @@ public class PlayerSkeleton {
 	public static final TetrisSolver IMPROVED_BASIC_SOLVER = new StartingSolver(new ImprovedHeuristics()); // FIXME
 	public static final MinMaxSolver IMPROVED_MINMAX_SOLVER = new MinMaxSolver(new ImprovedHeuristics(), 2);
 	public static final MinMaxSolver IMPROVED_DEEPER_MINMAX_SOLVER = new MinMaxSolver(new ImprovedHeuristics(), 3);
-																											// change
-																											// name!!!
+	// change
+	// name!!!
 
 	/**
 	 * Tool interface containing useful functions used by the heuristics
@@ -541,7 +541,7 @@ public class PlayerSkeleton {
 					float heuristicValue = minmax(next, d, false, weights, max, Float.POSITIVE_INFINITY);
 
 					if (heuristicValue > max) {
-					max = heuristicValue;
+						max = heuristicValue;
 						bestMove = n;
 					}
 					n++;
