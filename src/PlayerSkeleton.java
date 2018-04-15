@@ -25,30 +25,6 @@ public class PlayerSkeleton {
 	public static final float[] COMPUTED_WEIGHTS = { -4.0f, 0.0f, -1.0f, 0.0f, -2.0f, -1.0f, 0.0f, 0.0f, -1.0f, -2.0f,
 			1.0f, -3.0f, -1.0f, -2.0f, -2.0f, -2.0f, -1.0f, -2.0f, -2.0f, -1.0f, -3.0f, -9.0f };
 	
-	private static final float[] BEST_WEIGHTS_BEFORE = {
-			-2.3854287f , 
-			1.5162857f , 
-			-1.6114286f , 
-			-0.5400001f , 
-			0.40600008f , 
-			-0.49857128f , 
-			-0.20057154f , 
-			-0.73057157f , 
-			0.38442856f , 
-			0.5682857f , 
-			-0.4564284f , 
-			-2.1848571f , 
-			-1.4648573f , 
-			-1.7904286f , 
-			-1.0447145f , 
-			-1.3838573f , 
-			-0.9511427f , 
-			-2.3995717f , 
-			-0.5554285f , 
-			-3.0382855f , 
-			-0.64285725f , 
-			-8.159857f   // nicolas 15'000
-	} ;
 	
 	
 	public static final float[] BEST_WEIGHTS = {
@@ -70,11 +46,11 @@ public class PlayerSkeleton {
 	 * Solvers: different AI with different parameters
 	 * 
 	 */
-	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();
+	public static final RandomSolver RANDOM_SOLVER = new RandomSolver();//FIXME
 	public static final StartingSolver BASIC_SOLVER = new StartingSolver(new GivenHeuristic());
 	public static final MinMaxSolver MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 2);
 	public static final MinMaxSolver DEEPER_MINMAX_SOLVER = new MinMaxSolver(new GivenHeuristic(), 3);
-	public static final TetrisSolver EXPERIMENT_SOLVER = new StartingSolver(new ExperimentalHeuristics());
+	public static final TetrisSolver EXPERIMENT_SOLVER = new StartingSolver(new ExperimentalHeuristics()); //FIXME change name!!!
 
 	
 	
@@ -229,7 +205,7 @@ public class PlayerSkeleton {
 		 * @return
 		 * 		The vector of feature values at the state
 		 */
-		public float[] featureValues(State state);
+		public float[] featureValues(State state); //FIXME ????
 		
 		 /**
 	     * @return the number of weight used by the solver
@@ -327,6 +303,7 @@ public class PlayerSkeleton {
 
 	/**
 	 * Uses both given heuristics & new heuristics
+	 * FIXME change name?
 	 */
 	public static class ExperimentalHeuristics extends GivenHeuristic {
 

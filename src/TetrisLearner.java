@@ -1,5 +1,8 @@
 package src;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.stream.IntStream;
 
 /**
@@ -61,12 +64,15 @@ public interface TetrisLearner {
 	 */
 	public static int solveAvg(PlayerSkeleton.TetrisSolver solver,float[] weights, int maxLine, int n, int lastValue){
 		int sum = 0;
-
+		try(Writer writer = new BufferedWriter(new FileWriter("count.csv", true))){
+			
+		
 		// run num threads in parallel
 		final int threads = 4;
 
 		for (int i = 0; i < n; i+=threads) {
 			if(i==4 &&lastValue>50 && sum*4<i*lastValue*3){
+				writer.write(1+"\n");
 				return sum /i;
 			}
 
@@ -79,6 +85,9 @@ public interface TetrisLearner {
 		}
 
 		return sum/n;
+		}catch(Exception e){
+			throw new IllegalAccessError();
+		}
 
 	}
 

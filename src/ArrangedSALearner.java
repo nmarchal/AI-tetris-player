@@ -26,6 +26,8 @@ public final class ArrangedSALearner implements TetrisLearner {
 	public float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed,
 			float[] startingWeights) {
 
+		long startTime = System.currentTimeMillis();
+		
 		if(solver.weightsLength() != startingWeights.length){
 			throw new IllegalArgumentException("You should enter "+solver.weightsLength()+" weights instead of "+startingWeights.length );
 		}
@@ -53,7 +55,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 			for (int i = 0; i < weights.length; i++) {
 				writer.write("w" + i + ";");
 			}
-			writer.write("next Value; value;\n");
+			writer.write("next Value; value; time(ms);\n");
 			
 			
 			/*
@@ -91,7 +93,7 @@ public final class ArrangedSALearner implements TetrisLearner {
 				for (float w : next) {
 					writer.write(w + ";");
 				}
-				writer.write(nextVal + ";" + value + "\n");
+				writer.write(nextVal + ";" + value + ";" +(System.currentTimeMillis()-startTime)+"\n");
 				writer.flush();
 
 				/*
