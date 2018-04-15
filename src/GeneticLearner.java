@@ -29,6 +29,14 @@ public class GeneticLearner implements TetrisLearner {
 		}
 
 		try (Writer writer = new BufferedWriter(new FileWriter("data.csv", false))) {
+			
+			
+			for (int i = 0; i < startingWeights.length; i++) {
+				writer.write("w" + i + ";");
+			}
+			writer.write("next Value; value; time(ms);\n");
+			
+			long startTime = System.currentTimeMillis();
 			/*
 			 * Initialize population
 			 */
@@ -98,6 +106,11 @@ public class GeneticLearner implements TetrisLearner {
 				population.addAll(nextGen);
 				population.sort(bestVal);
 				population.subList(populationSize, population.size()).clear();
+				for (float w : nextGen.getFirst().getValue()) {
+					writer.write(w + ";");
+				}
+				writer.write(nextGen.getFirst().getKey() + ";" + population.getFirst().getKey() + ";" +(System.currentTimeMillis()-startTime)+"\n");
+				writer.flush();
 
 				System.out.println(n + "/" + duration + " : " + population.getFirst().getKey());
 			}
