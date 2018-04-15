@@ -89,7 +89,8 @@ public interface TetrisLearner {
 
 			return sum / n;
 		} catch (Exception e) {
-			throw new IllegalAccessError();
+			e.printStackTrace();
+			throw new Error();
 		}
 
 	}

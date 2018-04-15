@@ -84,22 +84,22 @@ public class Evaluate_Solver {
 						+ "\n\taverageTimePerTurn =\t" + avg);
 				writer.flush();
 
-				/*
-				 * AI 4: Minmax depth 2 given heuristic
-				 */
-				System.out.println("\nMinMax_solver depth 2 --> Basic Heuristic:");
-				aI = PlayerSkeleton.MINMAX_SOLVER;
-				s = new State();
-				startingTime = System.currentTimeMillis();
-				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
-					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS));
-				}
-				time = System.currentTimeMillis() - startingTime;
-				avg = time * NAVG / s.getTurnNumber();
-				writer.write("Minmax2;Given;" + s.getRowsCleared() + ";" + time + ";" + avg + ";" + s.hasLost() + "\n");
-				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
-						+ "\n\taverageTimePerTurn =\t" + avg);
-				writer.flush();
+//				/*
+//				 * AI 4: Minmax depth 2 given heuristic
+//				 */
+//				System.out.println("\nMinMax_solver depth 2 --> Basic Heuristic:");
+//				aI = PlayerSkeleton.MINMAX_SOLVER;
+//				s = new State();
+//				startingTime = System.currentTimeMillis();
+//				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
+//					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS));
+//				}
+//				time = System.currentTimeMillis() - startingTime;
+//				avg = time * NAVG / s.getTurnNumber();
+//				writer.write("Minmax2;Given;" + s.getRowsCleared() + ";" + time + ";" + avg + ";" + s.hasLost() + "\n");
+//				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
+//						+ "\n\taverageTimePerTurn =\t" + avg);
+//				writer.flush();
 //				
 //				/*
 //				 * AI 5: Minmax depth 3 given heuristic
