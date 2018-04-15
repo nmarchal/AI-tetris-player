@@ -9,7 +9,7 @@ public class Learning {
 				-3.1158588f, -2.380412f, -3.3974721f, -1.8160414f, -3.9547849f, -1.3370675f, -10.818589f, -6.772875f,
 				-0.35120985f, -0.037590336f, 0.4731508f };
 		TetrisLearner learner = new ArrangedSALearner(3014);
-		float[] optimalW = learner.learn(PlayerSkeleton.EXPERIMENT_SOLVER, 10000, 400_000, 8,best);
+		float[] optimalW = learner.learn(PlayerSkeleton.IMPROVED_BASIC_SOLVER, 10000, 400_000, 8,best);
 		System.out.println("END :");
 		for (float w : optimalW) {
 			System.out.println(w + "f , ");
