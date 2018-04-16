@@ -14,7 +14,7 @@ public class Evaluate_Solver {
 	 * 
 	 * @param args
 	 */
-	private static final boolean APPEND = true;
+	private static final boolean APPEND = false;
 
 	public static void main(String[] args) {
 		try (Writer writer = new BufferedWriter(new FileWriter("performances.csv", APPEND))) {
@@ -24,7 +24,7 @@ public class Evaluate_Solver {
 
 			System.out.println("Start:");
 			if (!APPEND) {
-				writer.write("AI;Heuristic;score;time;average_time;lost?\n");
+				writer.write("AI;Heuristic;score;time;average time for 100 moves;lost?;moves\n");
 			}
 			while (true) {
 
@@ -33,56 +33,56 @@ public class Evaluate_Solver {
 				/*
 				 * AI 1: BASIC with given heuristic
 				 */
-				System.out.println("\nBasic_solver --> Basic Heuristic:");
-				PlayerSkeleton.TetrisSolver aI = PlayerSkeleton.BASIC_SOLVER;
+				//System.out.println("\nBasic_solver --> Basic Heuristic:");
+				PlayerSkeleton.TetrisSolver aI = PlayerSkeleton.IMPROVED_MINMAX_SOLVER;
 				State s = new State();
 				long startingTime = System.currentTimeMillis();
-				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
-					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS));
-				}
-				time = System.currentTimeMillis() - startingTime;
-				avg = time * NAVG / s.getTurnNumber();
-				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
-						+ "\n\taverageTimePerTurn =\t" + avg);
-				writer.write("Basic;Given;" + s.getRowsCleared() + ";" + time + ";" + avg + ";" + s.hasLost() + "\n");
-				writer.flush();
-
-				/*
-				 * AI 2: BASIC WITH IMPROVED
-				 */
-				System.out.println("\nBasic_solver --> IMPROVED Heuristic:");
-				aI = PlayerSkeleton.IMPROVED_BASIC_SOLVER;
-				s = new State();
-				startingTime = System.currentTimeMillis();
-				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
+				while (!s.hasLost()) {
 					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS_IMPROVED));
 				}
 				time = System.currentTimeMillis() - startingTime;
 				avg = time * NAVG / s.getTurnNumber();
-				writer.write(
-						"Basic;Improved;" + s.getRowsCleared() + ";" + time + ";" + avg + ";" + s.hasLost() + "\n");
 				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
 						+ "\n\taverageTimePerTurn =\t" + avg);
+				writer.write("MinMax;Improved;" + s.getRowsCleared() + ";" + time + ";" + avg + ";" + s.hasLost()+ ";" + s.getTurnNumber()+ "\n");
 				writer.flush();
 
-				/*
-				 * AI 3: MinMax depth 1 with improved == Basic without
-				 * parallelism
-				 */
-				System.out.println("\nBasic_solver_No_para --> improved Heuristic:");
-				aI = new PlayerSkeleton.MinMaxSolver(new GivenHeuristic(), 1);
-				s = new State();
-				startingTime = System.currentTimeMillis();
-				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
-					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS));
-				}
-				time = System.currentTimeMillis() - startingTime;
-				avg = time * NAVG / s.getTurnNumber();
-				writer.write("Basic No parallelism;Given;" + s.getRowsCleared() + ";" + time + ";" + avg + ";"
-						+ s.hasLost() + "\n");
-				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
-						+ "\n\taverageTimePerTurn =\t" + avg);
-				writer.flush();
+//				/*
+//				 * AI 2: BASIC WITH IMPROVED
+//				 */
+//				System.out.println("\nBasic_solver --> IMPROVED Heuristic:");
+//				aI = PlayerSkeleton.IMPROVED_BASIC_SOLVER;
+//				s = new State();
+//				startingTime = System.currentTimeMillis();
+//				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
+//					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS_IMPROVED));
+//				}
+//				time = System.currentTimeMillis() - startingTime;
+//				avg = time * NAVG / s.getTurnNumber();
+//				writer.write(
+//						"Basic;Improved;" + s.getRowsCleared() + ";" + time + ";" + avg + ";" + s.hasLost() + "\n");
+//				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
+//						+ "\n\taverageTimePerTurn =\t" + avg);
+//				writer.flush();
+//
+//				/*
+//				 * AI 3: MinMax depth 1 with improved == Basic without
+//				 * parallelism
+//				 */
+//				System.out.println("\nBasic_solver_No_para --> improved Heuristic:");
+//				aI = new PlayerSkeleton.MinMaxSolver(new GivenHeuristic(), 1);
+//				s = new State();
+//				startingTime = System.currentTimeMillis();
+//				while (!s.hasLost() && MAX_TIME_PLAYING > System.currentTimeMillis() - startingTime) {
+//					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS));
+//				}
+//				time = System.currentTimeMillis() - startingTime;
+//				avg = time * NAVG / s.getTurnNumber();
+//				writer.write("Basic No parallelism;Given;" + s.getRowsCleared() + ";" + time + ";" + avg + ";"
+//						+ s.hasLost() + "\n");
+//				System.out.println("END :\n\tscore =\t" + s.getRowsCleared() + "\n\ttime =\t" + time
+//						+ "\n\taverageTimePerTurn =\t" + avg);
+//				writer.flush();
 
 //				/*
 //				 * AI 4: Minmax depth 2 given heuristic
