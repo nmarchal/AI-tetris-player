@@ -17,9 +17,9 @@ public class Evaluate_Solver {
 	private static final boolean APPEND = false;
 
 	public static void main(String[] args) {
-		try (Writer writer = new BufferedWriter(new FileWriter("performances.csv", APPEND))) {
+		try (Writer writer = new BufferedWriter(new FileWriter("performances3.csv", APPEND))) {
 
-			final long MAX_TIME_PLAYING = 900_000;
+			final long MAX_TIME_PLAYING = 9_000_000;
 			final long NAVG = 1000;
 
 			System.out.println("Start:");
@@ -38,7 +38,7 @@ public class Evaluate_Solver {
 				State s = new State();
 				long startingTime = System.currentTimeMillis();
 				while (!s.hasLost()) {
-					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS_IMPROVED));
+					s.makeMove(aI.pickMove(s, s.legalMoves(), PlayerSkeleton.BEST_WEIGHTS_FINAL));
 				}
 				time = System.currentTimeMillis() - startingTime;
 				avg = time * NAVG / s.getTurnNumber();
