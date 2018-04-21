@@ -1,4 +1,4 @@
-package src;
+package src.game;
 
 import java.awt.Color;
 
@@ -32,7 +32,7 @@ public class State {
 	
 	
 	//number of next piece
-	protected int nextPiece;
+	public int nextPiece;
 	
 	
 	
@@ -220,8 +220,7 @@ public class State {
 			top[slot+c]=height+pTop[nextPiece][orient][c];
 		}
 		
-		int rowsCleared = 0;
-		
+		int rowsCleared = 0;		
 		//check for full rows - starting at the top
 		for(int r = height+pHeight[nextPiece][orient]-1; r >= height; r--) {
 			//check all columns in the row

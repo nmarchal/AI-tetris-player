@@ -1,11 +1,11 @@
-package src;
+package src.learner;
 
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
 
 import javafx.util.Pair;
-import src.PlayerSkeleton.TetrisSolver;
+import src.agent.TetrisSolver;
 
 public class GeneticModifiedLearner2 implements TetrisLearner {
 

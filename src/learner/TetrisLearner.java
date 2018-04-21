@@ -1,9 +1,12 @@
-package src;
+package src.learner;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.stream.IntStream;
+
+import src.agent.TetrisSolver;
+import src.game.State;
 
 /**
  * Learner for Tetris. Implement a strategy to improve results over time
@@ -30,7 +33,7 @@ public interface TetrisLearner {
 	 *            learner
 	 * @return the final weights
 	 */
-	public float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed,
+	public float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed,
 			float[] startingWeights);
 
 	/**
@@ -49,7 +52,7 @@ public interface TetrisLearner {
 	 *            The number of games taken to do an average
 	 * @return the final weights
 	 */
-	public default float[] learn(PlayerSkeleton.TetrisSolver solver, int duration, int maxLine, int averageGamePlayed) {
+	public default float[] learn(TetrisSolver solver, int duration, int maxLine, int averageGamePlayed) {
 		return learn(solver, duration, maxLine, averageGamePlayed, new float[solver.weightsLength()]);
 	}
 
@@ -68,7 +71,7 @@ public interface TetrisLearner {
 	 * @param lastValue
 	 * @return the average number of rows cleared
 	 */
-	public static int solveAvg(PlayerSkeleton.TetrisSolver solver, float[] weights, int maxLine, int n, int lastValue) {
+	public static int solveAvg(TetrisSolver solver, float[] weights, int maxLine, int n, int lastValue) {
 		int sum = 0;
 		try (Writer writer = new BufferedWriter(new FileWriter("count.csv", true))) {
 
@@ -108,7 +111,7 @@ public interface TetrisLearner {
 	 *            die)
 	 * @return number of rows cleared
 	 */
-	public static int runStateTillCompletion(PlayerSkeleton.TetrisSolver solver, State s, int maxLine,
+	public static int runStateTillCompletion(TetrisSolver solver, State s, int maxLine,
 			float[] weights) {
 		while (!s.hasLost() && s.getRowsCleared() < maxLine) {
 			s.makeMove(solver.pickMove(s, s.legalMoves(), weights));
@@ -126,7 +129,7 @@ public interface TetrisLearner {
 	 * @param lastValue
 	 * @return
 	 */
-	public static int solveMin(PlayerSkeleton.TetrisSolver solver, float[] weights, int maxLine, int n, int lastValue) {
+	public static int solveMin(TetrisSolver solver, float[] weights, int maxLine, int n, int lastValue) {
 		int min = maxLine;
 		for (int i = 0; i < n; i++) {
 			State s = new State();
