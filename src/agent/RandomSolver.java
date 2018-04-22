@@ -1,6 +1,6 @@
-package src.agent;
+package agent;
 
-import src.game.State;
+import game.State;
 
 /**
  * Solver that return a random move
@@ -18,8 +18,5 @@ public final class RandomSolver implements TetrisSolver {
 		return 0;
 	}
 
-	public float[] featureValues(State s) {
-		return null;
-	}
 
 }

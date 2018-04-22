@@ -1,6 +1,6 @@
-package src.agent.heuristic;
+package agent.heuristic;
 
-import src.game.State;
+import game.State;
 
 /**
  * Interface of heuristic

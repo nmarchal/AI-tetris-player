@@ -1,12 +1,12 @@
-package src.learner;
+package learner;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.stream.IntStream;
 
-import src.agent.TetrisSolver;
-import src.game.State;
+import agent.TetrisSolver;
+import game.State;
 
 /**
  * Learner for Tetris. Implement a strategy to improve results over time

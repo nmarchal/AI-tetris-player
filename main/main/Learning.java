@@ -1,9 +1,9 @@
 package main;
 
-import src.agent.TetrisSolver;
-import src.agent.heuristic.ImprovedHeuristics;
-import src.learner.ArrangedSALearner;
-import src.learner.TetrisLearner;
+import agent.TetrisSolver;
+import agent.heuristic.ImprovedHeuristics;
+import learner.ArrangedSALearner;
+import learner.TetrisLearner;
 
 public class Learning {
 

@@ -1,12 +1,12 @@
-package src.agent;
+package agent;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import src.agent.heuristic.Heuristic;
-import src.game.State;
+import agent.heuristic.Heuristic;
+import game.State;
 
 /**
  * Solver using the heuristic function at depth 1
@@ -50,10 +50,6 @@ public final class StartingSolver implements TetrisSolver {
 	@Override
 	public int weightsLength() {
 		return heuristic.weightsLength();
-	}
-
-	public float[] featureValues(State s) {
-		return heuristic.featureValues(s);
 	}
 
 }

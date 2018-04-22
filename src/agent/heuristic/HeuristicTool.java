@@ -1,10 +1,10 @@
-package src.agent.heuristic;
+package agent.heuristic;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import src.game.State;
+import game.State;
 
 /**
  * Tool interface containing useful functions used by the heuristics

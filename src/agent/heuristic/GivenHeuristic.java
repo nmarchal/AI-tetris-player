@@ -1,6 +1,6 @@
-package src.agent.heuristic;
+package agent.heuristic;
 
-import src.game.State;
+import game.State;
 
 /**
  * class representing the heuristic given ins the projects instruction 0 ->

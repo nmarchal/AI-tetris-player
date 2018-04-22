@@ -1,4 +1,4 @@
-package src.learner;
+package learner;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -7,8 +7,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import agent.TetrisSolver;
 import javafx.util.Pair;
-import src.agent.TetrisSolver;
 
 public class GeneticLearner implements TetrisLearner {
 

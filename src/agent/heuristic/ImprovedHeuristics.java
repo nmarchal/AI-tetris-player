@@ -1,6 +1,6 @@
-package src.agent.heuristic;
+package agent.heuristic;
 
-import src.game.State;
+import game.State;
 
 /**
  * Uses both given heuristics & new heuristics FIXME change name?

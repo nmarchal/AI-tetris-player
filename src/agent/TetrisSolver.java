@@ -1,8 +1,8 @@
-package src.agent;
+package agent;
 
-import src.agent.heuristic.GivenHeuristic;
-import src.agent.heuristic.ImprovedHeuristics;
-import src.game.State;
+import agent.heuristic.GivenHeuristic;
+import agent.heuristic.ImprovedHeuristics;
+import game.State;
 
 /**
  * Interface that represent an AI for Tetris
@@ -32,15 +32,6 @@ public interface TetrisSolver {
 	 */
 	public int pickMove(State s, int[][] legalMoves, float[] weights);
 
-	/**
-	 * Return an approximation of the current state as a vector of the
-	 * features of the heuristic used by this solver, if any.
-	 * 
-	 * @param s
-	 *            The state to approximate
-	 * @return The feature vector of the state
-	 */
-	public float[] featureValues(State s);
 
 	/**
 	 * @return the number of weight used by the solver
@@ -56,10 +47,16 @@ public interface TetrisSolver {
 	 *            Current state of the game
 	 * @param move
 	 *            move played
+	 * @param next
+	 * 		next state of the game
 	 * @return the state of the game after playing the selected move
 	 */
 	public static State nextState(State s, int[] move) {
 		State next = new State();
+		return nextState(s, move, next);
+		
+	}
+	public static State nextState(State s, int[] move,State next) {
 		next.lost = s.lost;
 		next.nextPiece = s.nextPiece;
 		int[][] field = s.getField();

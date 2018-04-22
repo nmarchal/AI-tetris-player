@@ -1,4 +1,4 @@
-package src.learner;
+package learner;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -6,7 +6,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Random;
 
-import src.agent.TetrisSolver;
+import agent.TetrisSolver;
 
 public final class ArrangedSALearner implements TetrisLearner {
 

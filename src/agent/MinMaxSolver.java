@@ -1,7 +1,7 @@
-package src.agent;
+package agent;
 
-import src.agent.heuristic.Heuristic;
-import src.game.State;
+import agent.heuristic.Heuristic;
+import game.State;
 
 /**
  * Solver using MinMax Algorithm
@@ -32,7 +32,7 @@ public final class MinMaxSolver implements TetrisSolver {
 		int bestMove = 0;
 
 		int d = depth - 1;
-		while (max == Float.NEGATIVE_INFINITY && d >= 0) {
+		while (max == Float.NEGATIVE_INFINITY && d >0) {
 			int n = 0;
 			for (int[] move : legalMoves) {
 				State next = TetrisSolver.nextState(s, move);
@@ -79,8 +79,9 @@ public final class MinMaxSolver implements TetrisSolver {
 
 		if (maximizing) {
 			float best = Float.NEGATIVE_INFINITY;
+			State next = new State();
 			for (int[] move : s.legalMoves()) {
-				State next = TetrisSolver.nextState(s, move);
+				TetrisSolver.nextState(s, move,next);
 				float v = minmax(next, d - 1, false, weights, alpha, beta);
 				if (v > best) {
 					best = v;
@@ -112,7 +113,4 @@ public final class MinMaxSolver implements TetrisSolver {
 		}
 	}
 
-	public float[] featureValues(State s) {
-		return heuristic.featureValues(s);
-	}
 }
